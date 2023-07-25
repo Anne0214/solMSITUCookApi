@@ -1,6 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
+using prjMSITUCookApi.Mappings;
 using prjMSITUCookApi.Models.Parameter;
 using prjMSITUCookApi.Models.ViewModel;
+using prjMSITUCookApi.Service.Dtos.Info;
+using prjMSITUCookApi.Service.Dtos.ResultModel;
+using prjMSITUCookApi.Service.Implement;
+using prjMSITUCookApi.Service.Interface;
+using System.Security.Cryptography.Xml;
 
 namespace prjMSITUCookApi.Controllers
 {
@@ -8,6 +15,16 @@ namespace prjMSITUCookApi.Controllers
     [Route("[controller]")]
     public class NotificationController:ControllerBase
     {
+        private readonly INotificationService _notificationService;
+        private readonly IMapper _mapper;
+
+        public NotificationController() {
+            _notificationService = new NotificationService();
+            var config = new MapperConfiguration(cfg =>
+            cfg.AddProfile<ControllerMappings>());
+
+            this._mapper = config.CreateMapper();
+        }
         /// <summary>
         /// 取得一筆通知詳情
         /// </summary>
@@ -19,8 +36,10 @@ namespace prjMSITUCookApi.Controllers
         [Route("{id}")]
         public NotificationViewModel Get([FromRoute] int id){
 
-            var n = new NotificationViewModel();
-            return n;
+            var info = this._notificationService.Get(id);
+            var result = this._mapper.Map<NotificationResultModel,NotificationViewModel>(info);
+
+            return result;
         }
 
         /// <summary>
@@ -31,9 +50,17 @@ namespace prjMSITUCookApi.Controllers
         [HttpGet]
         [Produces("application/json")] //指定回傳格式是json
         public IEnumerable<NotificationViewModel> GetList([FromQuery] NotificationSearchParameter parameter) {
-            IEnumerable<NotificationViewModel> n = null;
+            var info = this._mapper.Map<NotificationSearchParameter,NotificationSearchInfo>(parameter);
+            var list = _notificationService.GetList(info);
 
-            return n;
+            List<NotificationViewModel> vms = new List<NotificationViewModel>();
+            
+            foreach (var i in list) {
+                var vm = this._mapper.Map<NotificationResultModel, NotificationViewModel>(i);
+                vms.Add(vm);
+            }
+
+            return vms;
         }
 
         ///// <summary>
@@ -55,7 +82,11 @@ namespace prjMSITUCookApi.Controllers
         [HttpPut]
         [Route("{id}")]
         public IActionResult Read([FromRoute] int id) {
-            return Ok();
+            var result = _notificationService.Read(id);
+            if (result) {
+                return Ok();
+            }
+            return StatusCode(500);
         }
         /// <summary>
         /// 針對一群通知改為已讀
@@ -64,6 +95,7 @@ namespace prjMSITUCookApi.Controllers
         /// <returns></returns>
         [HttpPut]
         public IActionResult ReadList([FromBody] List<int> idList ) {
+
             return Ok();
         }
 
@@ -75,7 +107,11 @@ namespace prjMSITUCookApi.Controllers
         [HttpDelete]
         public IActionResult Delete(int id) {
 
-            return Ok();
+            var result = _notificationService.Delete(id);
+            if (result) {
+                return Ok();
+            }
+            return StatusCode(500);
         }
     }
 }

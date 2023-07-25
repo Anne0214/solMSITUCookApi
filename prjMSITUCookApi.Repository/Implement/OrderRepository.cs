@@ -1,0 +1,36 @@
+﻿using Dapper;
+using prjMSITUCookApi.Repository.Dtos.DataModel;
+using prjMSITUCookApi.Repository.Interface;
+using System;
+using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace prjMSITUCookApi.Repository.Implement
+{
+
+    public class OrderRepository:IOrderRepository
+    {
+        private readonly string _connectString = @"Data Source=.;Initial Catalog=iSpanDataBaseUCook_V2;Integrated Security=True;TrustServerCertificate=true;MultipleActiveResultSets=true";
+
+        OrderDataModel IOrderRepository.Get(int id)
+        {
+            string sql = @"Select * From [ORDER訂單] as a
+                            InnerJoin [ORDER_DETAILS訂單明細] as b
+                            on a.[ORDER_NUMBER訂單號碼_PK] = b. [ORDER_NUMBER訂單號碼_FK]
+                            InnerJoin [PRODUCT_SPU_商品] as c
+                            on c.[SPU] = b.[SPU]
+                            Where [ORDER_NUMBER訂單號碼_PK] = @Id";
+            var parameter = new DynamicParameters();
+            parameter.Add("Id", id);
+            using (var conn = new SqlConnection(_connectString))
+            {
+                var result = conn.QueryFirstOrDefault<OrderDataModel>(sql, parameter);
+                return result;
+            }
+
+        }
+    }
+}

@@ -23,6 +23,7 @@ namespace prjMSITUCookApi.Mappings
             //notification
             //parameter ->info
             this.CreateMap<NotificationSearchParameter, NotificationSearchInfo>();
+            //resultModel ->viewModel
             this.CreateMap<NotificationRelatedMemberResultModel, NotificationRelatedMemberViewModel>();
             this.CreateMap<NotificationRelatedOrderResultModel, NotificationRelatedOrderViewModel>();
             this.CreateMap<NotificationRelatedRecipeResultModel, NotificationRelatedRecipeViewModel>();
