@@ -99,6 +99,8 @@ namespace prjMSITUCookApi.Service.Implement
                 result.Add(item);
 
             }
+
+            //todo 合併類似通知:5號追蹤通知，如果近三天有類似通知會合併
             return result;
         }
         

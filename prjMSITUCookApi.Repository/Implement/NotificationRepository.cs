@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -17,6 +18,7 @@ namespace prjMSITUCookApi.Repository.Implement
         private readonly string _connectString = @"Data Source=.;Initial Catalog=iSpanDataBaseUCook_V2;Integrated Security=True;TrustServerCertificate=true;MultipleActiveResultSets=true";
 
 
+        //刪除一則通知
         bool INotificationRepository.Delete(int id)
         {
             var sql = @"Delete From NOTIFICATION_RECORD_通知紀錄
@@ -39,6 +41,19 @@ namespace prjMSITUCookApi.Repository.Implement
             using (var conn = new SqlConnection()) {
                 var result = conn.QueryFirstOrDefault<NotificationDataModel>(sql,parameter);
                 return result;
+            }
+        }
+
+        //新增通知
+        public bool Create(NotificationCondition info) {
+            var sql = @"Insert into NOTIFICATION_RECORD_通知紀錄
+                            Values(,,,)
+                            SELECT @@IDENTITY";
+            var parameter = new DynamicParameters();
+            
+            using (var conn = new SqlConnection(_connectString)) { 
+                var result = conn.Execute(sql, parameter);
+                return result > 0;
             }
         }
 

@@ -15,7 +15,13 @@ namespace prjMSITUCookApi.Repository.Interface
 
         //取得某用戶的某類通知(或全部)
         IEnumerable<NotificationDataModel> GetList(NotificationSearchCondition info);
-        
+
+        /// <summary>
+        /// 建立一則通知
+        /// </summary>
+        /// <param name="info"></param>
+        /// <returns></returns>
+        bool Create(NotificationCondition info);
         //針對一則通知改為已讀
         bool Read(int id);
 

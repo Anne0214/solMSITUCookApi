@@ -89,13 +89,13 @@ namespace prjMSITUCookApi.Controllers
             return StatusCode(500);
         }
         /// <summary>
-        /// 針對一群通知改為已讀
+        /// 將一群通知改為已讀
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="parameter"></param>
         /// <returns></returns>
         [HttpPut]
-        public IActionResult ReadList([FromBody] List<int> idList ) {
-
+        public IActionResult ReadList([FromBody] List<NotificationListParameter> parameter ) {
+            
             return Ok();
         }
 
