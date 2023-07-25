@@ -66,11 +66,16 @@ namespace prjMSITUCookApi.Repository.Implement
         {
 
             var sql = @"Select * From NOTIFICATION_RECORD_通知紀錄
-                            Where [MEMBER_ID會員_FK] = @Id
-                            And [NOTIFICATION_TYPE通知類型編號]=@Type";
+                            Where [MEMBER_ID會員_FK] = @Id";
             var parameter = new DynamicParameters();
             parameter.Add("Id", info.MemberId);
-            parameter.Add("Type", info.Type);
+
+            //當type為0時會顯示所有通知
+            if (info.Type != 0) {
+                sql += " And [NOTIFICATION_TYPE通知類型編號]=@Type";
+                parameter.Add("Type", info.Type);
+            }
+            
             using (var conn = new SqlConnection(_connectString))
             {
                 var result = conn.Query<NotificationDataModel>(sql, parameter);
@@ -97,16 +102,31 @@ namespace prjMSITUCookApi.Repository.Implement
 
         bool INotificationRepository.ReadList(List<int> idList)
         {
-            //todo 尚未實作
-            foreach (int id in idList) {
-                string sql = @"Update NOTIFICATION_RECORD_通知紀錄
+            using (var conn = new SqlConnection(_connectString)) {
+                conn.Open();
+                using (var tran = conn.BeginTransaction()) {
+                    foreach (int id in idList)
+                    {
+                        ///針對每個id去做修改
+                        string sql = @"Update NOTIFICATION_RECORD_通知紀錄
                             Set READED_已讀時間=@DateTime
                             Where NOTIFICATION_RECORD_通知紀錄_PK = @Id";
-                var parameter = new DynamicParameters();
-                parameter.Add("DateTime", DateTime.Now);
-                parameter.Add("Id", id);
+                        var parameter = new DynamicParameters();
+                        parameter.Add("DateTime", DateTime.Now);
+                        parameter.Add("Id", id);
+                        var result = conn.Execute(sql, parameter);
+                        if (result <= 0) {
+                            tran.Rollback();
+                            return false;
+                        }
+                    }
+                    tran.Commit();
+                }
+            
             }
+                
             return true;
+            
         }
     }
 }

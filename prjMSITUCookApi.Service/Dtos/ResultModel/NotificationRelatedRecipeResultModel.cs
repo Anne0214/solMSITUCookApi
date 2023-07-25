@@ -32,6 +32,10 @@ namespace prjMSITUCookApi.Service.Dtos.ResultModel
         /// 食譜讚數
         /// </summary>
         public int Likes { get; set; }
+        /// <summary>
+        /// 食譜發文時間
+        /// </summary>
+        public DateTime PublishedTime { get; set; }
 
     }
 }

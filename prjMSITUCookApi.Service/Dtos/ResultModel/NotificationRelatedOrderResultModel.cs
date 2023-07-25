@@ -16,6 +16,10 @@ namespace prjMSITUCookApi.Service.Dtos.ResultModel
         /// 該訂單任一筆商品的圖片
         /// </summary>
         public string ProductPicture { get; set; }
+        /// <summary>
+        /// 會員
+        /// </summary>
+        public int MemberId { get; set; }
 
     }
 }

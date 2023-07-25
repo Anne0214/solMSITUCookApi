@@ -42,9 +42,22 @@ namespace prjMSITUCookApi.Service.Mappings
                 .ForMember(x=> x.NotificationId, y=>y.MapFrom(o =>o.NOTIFICATION_RECORD_通知紀錄_PK))
                 .ForMember(x=> x.Type,y => y.MapFrom(o =>o.NOTIFICATION_TYPE通知類型編號))
                 .ForMember(x=> x.NotificationTime, y=>y.MapFrom(o=>o.NOTIFY_TIME通知時間));
-            this.CreateMap<RecipeDataModel, NotificationRelatedRecipeResultModel>();
-            this.CreateMap<OrderDataModel, NotificationRelatedOrderResultModel>();
-            this.CreateMap<MemberDataModel, NotificationRelatedMemberResultModel>();
+            this.CreateMap<RecipeDataModel, NotificationRelatedRecipeResultModel>()
+                .ForMember(x =>x.Id,y=>y.MapFrom(o=>o.RECIPE食譜_PK))
+                .ForMember(x=>x.AuthorName,y=>y.MapFrom(o=>o.NICK_NAME暱稱))
+                .ForMember(x=> x.Name, y=>y.MapFrom(o=>o.RECIPE_NAME食譜名稱))
+                .ForMember(x=>x.Cover,y=>y.MapFrom(o=>o.RECIPE_COVER))
+                .ForMember(x=>x.AuthorProfilePicture,y=>y.MapFrom(o=>o.PROFILE_PHOTO頭貼))
+                .ForMember(x=>x.Likes,y=>y.MapFrom(o=>o.LIKES_讚數))
+                .ForMember(x=>x.PublishedTime,y=>y.MapFrom(o=>o.PUBLISHED_TIME出版時間));
+            this.CreateMap<OrderDataModel, NotificationRelatedOrderResultModel>()
+                .ForMember(x=>x.id,y=>y.MapFrom(o=>o.ORDER_NUMBER訂單號碼_PK))
+                .ForMember(x=>x.ProductPicture,y=>y.MapFrom(o=>o.img))
+                .ForMember(x=>x.MemberId,y=>y.MapFrom(o=>o.MEMBER_ID會員_FK));
+            this.CreateMap<MemberDataModel, NotificationRelatedMemberResultModel>()
+                .ForMember(x=>x.Nickname,y=>y.MapFrom(o=>o.NICK_NAME暱稱))
+                .ForMember(x=>x.ProfilePicture,y=>y.MapFrom(o=>o.PROFILE_PHOTO頭貼))
+                .ForMember(x=>x.Id,y=>y.MapFrom(o=>o.MEMBER_ID會員_PK));
 
 
         }

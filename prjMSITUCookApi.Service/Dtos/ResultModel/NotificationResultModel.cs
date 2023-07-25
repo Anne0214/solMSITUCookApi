@@ -45,7 +45,9 @@ namespace prjMSITUCookApi.Service.Dtos.ResultModel
         /// 該則通知相關訂單資訊
         /// </summary>
         public NotificationRelatedOrderResultModel? RelatedOrder { get; set; }
-
-
+        /// <summary>
+        /// for type=6，紀錄合併的訊息數
+        /// </summary>
+        public int count { get; set; }
     }
 }

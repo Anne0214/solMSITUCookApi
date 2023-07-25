@@ -94,9 +94,14 @@ namespace prjMSITUCookApi.Controllers
         /// <param name="parameter"></param>
         /// <returns></returns>
         [HttpPut]
-        public IActionResult ReadList([FromBody] List<NotificationListParameter> parameter ) {
-            
-            return Ok();
+        public IActionResult ReadList([FromBody] List<int> parameter ) {
+
+            var result = _notificationService.ReadList(parameter);
+            if (result) {
+                return Ok();
+            }
+
+            return StatusCode(500);
         }
 
         /// <summary>

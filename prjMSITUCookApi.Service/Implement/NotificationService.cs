@@ -10,6 +10,7 @@ using prjMSITUCookApi.Service.Mappings;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -70,6 +71,7 @@ namespace prjMSITUCookApi.Service.Implement
 
         IEnumerable<NotificationResultModel> INotificationService.GetList(NotificationSearchInfo info)
         {
+
             //todo IEnumerable跟list
             var condition = this._mapper.Map<NotificationSearchInfo,NotificationSearchCondition>(info);
             var list = _notificationRepo.GetList(condition);
@@ -99,8 +101,43 @@ namespace prjMSITUCookApi.Service.Implement
                 result.Add(item);
 
             }
+            //todo 近一周的追蹤通知合成一條
+            //取得近一周通知且type=5的通知
+            var delete = result.Where(x => (DateTime.Now.AddDays(-7) - x.NotificationTime).TotalDays < 0
+                            && x.Type == 5);
+            //從result中刪除這些通知
+            result = result.Except(delete).ToList();
+            //撰寫新的放入result
+            result.Add(new NotificationResultModel() {
+                NotificationTime = DateTime.Now,
+                MemberId = info.MemberId,
+                NotificationId = 6, //todo新增通知類型
+                ReadTime = null,
+                count = delete.Count(),
+                RelatedMember = delete.ToList()[0].RelatedMember//隨機挑選幸運觀眾
+            }); ;
 
-            //todo 合併類似通知:5號追蹤通知，如果近三天有類似通知會合併
+            //todo 我只給最新的一條type=4 && 同一個recipe
+            //也就是在type=4的裡面，我只留薪的，刪舊的
+
+            if (info.Type !=4 && info.Type !=0)
+            {
+                return result;
+            }
+            if (info.Type == 0) {
+                //先篩出所有type=4
+                result = result.Where(x => x.Type == 4).ToList();
+            }
+            
+            //挑出type=4裡面要留的
+            var keep = result.OrderByDescending(y => y.NotificationTime)
+                .GroupBy(t => t.RelatedRecipe.Id)
+                .Select(x => x.FirstOrDefault());
+            //挑出type=4裡面要丟的
+            var trash = result.Except(keep);
+            //從result裡面丟掉
+            result = result.Except(trash).ToList();
+            
             return result;
         }
         
@@ -112,7 +149,8 @@ namespace prjMSITUCookApi.Service.Implement
 
         bool INotificationService.ReadList(List<int> idList)
         {
-            throw new NotImplementedException();
+            var result = _notificationRepo.ReadList(idList);
+            return result;
         }
     }
 }
