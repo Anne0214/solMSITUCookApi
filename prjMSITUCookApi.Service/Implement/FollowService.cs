@@ -45,7 +45,7 @@ namespace prjMSITUCookApi.Service.Implement
             var condition = this._mapper.Map<FollowDeleteInfo, FollowDeleteCondition>(info);
             //調用repo取得結果
             var data = this._followRepository.Delete(condition);
-            //轉為最終result
+
 
             
             return data;

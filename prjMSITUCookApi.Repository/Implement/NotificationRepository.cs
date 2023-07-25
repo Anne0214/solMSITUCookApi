@@ -47,10 +47,15 @@ namespace prjMSITUCookApi.Repository.Implement
         //新增通知
         public bool Create(NotificationCondition info) {
             var sql = @"Insert into NOTIFICATION_RECORD_通知紀錄
-                            Values(,,,)
+                            Values(@MemberId,@NotifyTime,null,@Type,@RelatedRecipe,@RelatedMember,@RelatedOrder)
                             SELECT @@IDENTITY";
             var parameter = new DynamicParameters();
-            
+            parameter.Add("MemberId", info.MemberId);
+            parameter.Add("NotifyTime", DateTime.Now);
+            parameter.Add("Type",info.Type);
+            parameter.Add("RelatedMember",info.RelatedMemberId);
+            parameter.Add("RelatedRecipe", info.RelatedRecipeId);
+            parameter.Add("RelatedOrder", info.RelatedOrderId);
             using (var conn = new SqlConnection(_connectString)) { 
                 var result = conn.Execute(sql, parameter);
                 return result > 0;
@@ -59,13 +64,14 @@ namespace prjMSITUCookApi.Repository.Implement
 
         IEnumerable<NotificationDataModel> INotificationRepository.GetList(NotificationSearchCondition info)
         {
-            //todo 改sql
+
             var sql = @"Select * From NOTIFICATION_RECORD_通知紀錄
-                            Where NOTIFICATION_RECORD_通知紀錄_PK = id";
+                            Where [MEMBER_ID會員_FK] = @Id
+                            And [NOTIFICATION_TYPE通知類型編號]=@Type";
             var parameter = new DynamicParameters();
             parameter.Add("Id", info.MemberId);
             parameter.Add("Type", info.Type);
-            using (var conn = new SqlConnection())
+            using (var conn = new SqlConnection(_connectString))
             {
                 var result = conn.Query<NotificationDataModel>(sql, parameter);
                 return result;
