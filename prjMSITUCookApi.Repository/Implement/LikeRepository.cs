@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using prjMSITUCookApi.Repository.Dtos.Condition;
+using prjMSITUCookApi.Repository.Dtos.DataModel;
 using prjMSITUCookApi.Repository.Interface;
 using System;
 using System.Collections.Generic;
@@ -13,7 +14,7 @@ namespace prjMSITUCookApi.Repository.Implement
     public class LikeRepository : ILikeRepository
     {
         private readonly string _connectString = @"Data Source=.;Initial Catalog=iSpanDataBaseUCook_V2;Integrated Security=True;TrustServerCertificate=true;MultipleActiveResultSets=true";
-
+        
         bool ILikeRepository.Delete(LikeDeleteCondition info)
         {
             string sql = @"Delete From [LATEST_LIKE_LOG_最新按讚紀錄]
@@ -27,6 +28,18 @@ namespace prjMSITUCookApi.Repository.Implement
             using (var conn = new SqlConnection(_connectString)) {
                 var result = conn.Execute(sql, parameter);
                 return result > 0;
+            }
+        }
+
+        IEnumerable<LikeDataModel> ILikeRepository.GetList(LikeSearchCondition info)
+        {
+            string sql = @"Select * From [LATEST_LIKE_LOG_最新按讚紀錄]
+                            Where [LIKED_RECIPE按讚食譜_FK]=@RecipeId";
+            var parameter = new DynamicParameters();
+            parameter.Add("RecipeId", info.RecipeId);
+            using (var conn = new SqlConnection(_connectString)) {
+                var result = conn.Query<LikeDataModel>(sql, parameter);
+                return result;
             }
         }
 
@@ -44,5 +57,7 @@ namespace prjMSITUCookApi.Repository.Implement
                 return result > 0;
             }
         }
+
+        
     }
 }

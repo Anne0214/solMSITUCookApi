@@ -10,25 +10,21 @@ using System.Threading.Tasks;
 
 namespace prjMSITUCookApi.Repository.Implement
 {
-    public class RecipeRepository : IRecipeRepository
+    public class NotificationTypeRepository : INotificationTypeRepository
     {
         private readonly string _connectString = @"Data Source=.;Initial Catalog=iSpanDataBaseUCook_V2;Integrated Security=True;TrustServerCertificate=true;MultipleActiveResultSets=true";
 
-        RecipeDataModel IRecipeRepository.Get(int id)
+        NotificationTypeDataModel INotificationTypeRepository.Get(int id)
         {
-            string sql = @"Select * From [RECIPE_食譜] as a
-                            Inner Join [MEMBER_會員] as b
-                            on a.[AUTHOR_作者] = b.[MEMBER_ID會員_PK]
-                            Where [RECIPE食譜_PK] = @Id";
+            string sql = @"Select * Where [NOTIFICATION_TYPE_通知類型編號_PK]=@Id";
             var parameter = new DynamicParameters();
             parameter.Add("Id", id);
-            using (var conn = new SqlConnection(_connectString))
-            {
-                var result = conn.QueryFirstOrDefault<RecipeDataModel>(sql, parameter);
+
+            using (var conn = new SqlConnection(_connectString)) {
+                var result = conn.QueryFirstOrDefault<NotificationTypeDataModel>(sql,parameter);
                 return result;
             }
-
-
+            
         }
     }
 }

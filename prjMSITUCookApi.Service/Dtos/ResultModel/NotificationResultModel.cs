@@ -32,7 +32,7 @@ namespace prjMSITUCookApi.Service.Dtos.ResultModel
         /// <summary>
         /// 通知類型名稱
         /// </summary>
-        public int TypeName { get; set; }
+        public string TypeName { get; set; }
         /// <summary>
         /// 該則通知相關食譜資訊
         /// </summary>

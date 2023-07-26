@@ -35,10 +35,10 @@ namespace prjMSITUCookApi.Repository.Implement
         NotificationDataModel INotificationRepository.Get(int id)
         {
             var sql = @"Select * From NOTIFICATION_RECORD_通知紀錄
-                            Where NOTIFICATION_RECORD_通知紀錄_PK = id";
+                            Where NOTIFICATION_RECORD_通知紀錄_PK = @Id";
             var parameter = new DynamicParameters();
             parameter.Add("Id", id);
-            using (var conn = new SqlConnection()) {
+            using (var conn = new SqlConnection(_connectString)) {
                 var result = conn.QueryFirstOrDefault<NotificationDataModel>(sql,parameter);
                 return result;
             }
@@ -114,7 +114,7 @@ namespace prjMSITUCookApi.Repository.Implement
                         var parameter = new DynamicParameters();
                         parameter.Add("DateTime", DateTime.Now);
                         parameter.Add("Id", id);
-                        var result = conn.Execute(sql, parameter);
+                        var result = conn.Execute(sql, parameter,tran);
                         if (result <= 0) {
                             tran.Rollback();
                             return false;

@@ -1,4 +1,5 @@
 ﻿using prjMSITUCookApi.Repository.Dtos.Condition;
+using prjMSITUCookApi.Repository.Dtos.DataModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,6 +24,13 @@ namespace prjMSITUCookApi.Repository.Interface
         /// <param name="info"></param>
         /// <returns></returns>
         bool Delete(LikeDeleteCondition info);
+
+        /// <summary>
+        /// 取得符合條件的點讚紀錄
+        /// </summary>
+        /// <param name="info"></param>
+        /// <returns></returns>
+        IEnumerable<LikeDataModel> GetList(LikeSearchCondition info);
 
     }
 }
