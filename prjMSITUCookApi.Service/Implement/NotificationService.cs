@@ -121,19 +121,23 @@ namespace prjMSITUCookApi.Service.Implement
             var delete = result.Where(x => (DateTime.Now.AddDays(-7) - x.NotificationTime).TotalDays < 0
                             && x.Type == 5).ToList();
             //從result中刪除這些通知
-            result = result.Except(delete).ToList();
-            //撰寫新的放入result
-            var mergeNotification = new NotificationResultModel()
-            {
-                NotificationTime = DateTime.Now,
-                MemberId = info.MemberId,
-                NotificationId =0,
-                Type=6,
-                ReadTime = null,
-                count = delete.Count(),
-                RelatedMember = delete.ToList()[0].RelatedMember//隨機挑選幸運觀眾
-            };
-            result.Add(mergeNotification);
+            if (delete.Count() > 3) {
+                result = result.Except(delete).ToList();
+                //撰寫新的放入result
+                var mergeNotification = new NotificationResultModel()
+                {
+                    NotificationTime = DateTime.Now,
+                    MemberId = info.MemberId,
+                    NotificationId = 0,
+                    Type = 6,
+                    TypeName = _typeRepo.Get(6).NOTIFICATION_TYPE_NAME通知類型名稱,
+                    ReadTime = null,
+                    count = delete.Count(),
+                    RelatedMember = delete.ToList()[0].RelatedMember//隨機挑選幸運觀眾
+                };
+                result.Add(mergeNotification);
+            }
+            
 
             //我只給最新的一條type=4 && 同一個recipe
             //也就是在type=4的裡面，我只留薪的，刪舊的
