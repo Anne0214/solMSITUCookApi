@@ -10,9 +10,6 @@
         /// 追蹤誰
         /// </summary>
         public int FollowWhom { get; set; }
-        /// <summary>
-        /// 追蹤發生時間
-        /// </summary>
-        public DateTime FollowTime { get; set; }
+
     }
 }
