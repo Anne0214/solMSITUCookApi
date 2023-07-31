@@ -16,7 +16,7 @@ namespace prjMSITUCookApi.Repository.Implement
 
         NotificationTypeDataModel INotificationTypeRepository.Get(int id)
         {
-            string sql = @"Select * Where [NOTIFICATION_TYPE_通知類型編號_PK]=@Id";
+            string sql = @"Select *  From [NOTIFICATION_TYPE_通知類型] Where [NOTIFICATION_TYPE_通知類型編號_PK]=@Id";
             var parameter = new DynamicParameters();
             parameter.Add("Id", id);
 

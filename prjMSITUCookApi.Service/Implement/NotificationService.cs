@@ -30,6 +30,8 @@ namespace prjMSITUCookApi.Service.Implement
             _orderRepo = new OrderRepository();
             _memberRepo = new MemberRepository();
             _notificationRepo = new NotificationRepository();
+            _likeRepo = new LikeRepository();
+            _typeRepo = new NotificationTypeRepository();
 
             var config = new MapperConfiguration(cfg =>
             cfg.AddProfile<ServiceMappings>());
@@ -104,11 +106,15 @@ namespace prjMSITUCookApi.Service.Implement
                 {
                     var recipe = _recipeRepo.Get((int)i.LINKED_RECIPE相關食譜_FK);
                     NotificationRelatedRecipeResultModel result_recipe = this._mapper.Map<RecipeDataModel, NotificationRelatedRecipeResultModel>(recipe);
-                    var likes = _likeRepo.GetList(new LikeSearchCondition()
+                    var target = new LikeSearchCondition()
                     {
                         RecipeId = recipe.RECIPE食譜_PK
-                    }).Count();
-                    result_recipe.Likes += likes;
+                    };
+                    var likeList = _likeRepo.GetList(target);
+                    if (likeList != null && likeList.Count() > 0) {
+                        var likes = likeList.Count();
+                        result_recipe.Likes += likes;
+                    }
                     item.RelatedRecipe = result_recipe;
                 }
                 var typeName = _typeRepo.Get(i.NOTIFICATION_TYPE通知類型編號).NOTIFICATION_TYPE_NAME通知類型名稱;
