@@ -8,6 +8,7 @@ using prjMSITUCookApi.Service.Dtos.ResultModel;
 using prjMSITUCookApi.Service.Interface;
 using prjMSITUCookApi.Service.Mappings;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
@@ -126,6 +127,8 @@ namespace prjMSITUCookApi.Service.Implement
             //取得近一周通知且type=5的通知
             var delete = result.Where(x => (DateTime.Now.AddDays(-7) - x.NotificationTime).TotalDays < 0
                             && x.Type == 5).ToList();
+            //確認裡面有沒有未讀的訊息，只要有一條，該合併後的訊息就要顯示未讀
+            bool unreadExist = delete.Any(x=>x.ReadTime==null);
             //從result中刪除這些通知
             if (delete.Count() > 3) {
                 result = result.Except(delete).ToList();
@@ -137,9 +140,10 @@ namespace prjMSITUCookApi.Service.Implement
                     NotificationId = 0,
                     Type = 6,
                     TypeName = _typeRepo.Get(6).NOTIFICATION_TYPE_NAME通知類型名稱,
-                    ReadTime = null,
-                    count = delete.Count(),
-                    RelatedMember = delete.ToList()[0].RelatedMember//隨機挑選幸運觀眾
+                    ReadTime = unreadExist?null:DateTime.Now, //合併的訊息中有任何一條是未讀則要顯示未讀
+                    MergedNotificationCount = delete.Count(),
+                    RelatedMember = delete.ToList()[0].RelatedMember,//隨機挑選幸運觀眾
+                    MergeNotificationId = delete.Select(x=>x.NotificationId).ToList() //合併的訊息們的編號
                 };
                 result.Add(mergeNotification);
             }
@@ -170,13 +174,68 @@ namespace prjMSITUCookApi.Service.Implement
         
         bool INotificationService.Read(int id)
         {
-            var result = _notificationRepo.Read(id);
+            //如果該通知type=4，會找同recipe的之前的通知通通已讀
+            var notification = _notificationRepo.Get(id);
+            var condition = new NotificationSearchCondition()
+            {
+                MemberId= notification.MEMBER_ID會員_FK,
+                Type=4
+            };
+            //找到過去的、同食譜的、未讀的通知們
+            var mustReadList = _notificationRepo.GetList(condition)
+                            .Where(x=>x.LINKED_RECIPE相關食譜_FK==notification.LINKED_RECIPE相關食譜_FK && 
+                                    x.NOTIFY_TIME通知時間<=notification.NOTIFY_TIME通知時間
+                                    && x.READED_已讀時間 ==null)
+                            .Select(y=>y.NOTIFICATION_RECORD_通知紀錄_PK)
+                            .ToList();
+            //全部弄成已讀
+            var result = _notificationRepo.ReadList(mustReadList);
+
             return result;
         }
 
         bool INotificationService.ReadList(List<int> idList)
         {
-            var result = _notificationRepo.ReadList(idList);
+            //要丟給已讀的清單
+            List<int> mustReadList = new List<int>();
+            
+     
+            //加入目前要已讀的編號們
+            mustReadList.AddRange(idList);
+
+            //商業邏輯: type4號通知本身有篩選，GetList只顯示同食譜編號的最新通知
+            //故需要把readlist裡面的四號通知，找出在他之前尚未已讀的同食譜編號通知
+            //一起做已讀
+
+            foreach (int i in idList) {
+                //找出前端裡面要已讀的四號通知
+                var notification=_notificationRepo.Get(i);
+                if (notification.NOTIFICATION_TYPE通知類型編號 == 4) {
+                    //找出該用戶的所有四號通知
+                    var condition = new NotificationSearchCondition()
+                    {
+                        MemberId = notification.MEMBER_ID會員_FK,
+                        Type = 4
+                    };
+                    //再篩選出該四號同知的同食譜、舊通知、尚未已讀的通知，取得他們的通知pk
+                    var mustRead = _notificationRepo.GetList(condition)
+                                .Where(x => x.LINKED_RECIPE相關食譜_FK == notification.LINKED_RECIPE相關食譜_FK
+                                        && x.NOTIFY_TIME通知時間 <= notification.NOTIFY_TIME通知時間
+                                        && x.READED_已讀時間 == null)
+                                .Select(y => y.NOTIFICATION_RECORD_通知紀錄_PK)
+                                .ToList();
+                    //加入mustReadList清單
+                    mustReadList.AddRange(mustRead);
+                }
+            }
+
+            //清除mustReadList裡面重複的編號
+            mustReadList = mustReadList.Distinct().ToList();
+
+            //清除0
+            //Predicate<int> zero = (int x) => { return x == 0; };
+            mustReadList.Remove(0);
+            var result = _notificationRepo.ReadList(mustReadList);
             return result;
         }
     }

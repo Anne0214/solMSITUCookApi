@@ -41,7 +41,11 @@
         /// <summary>
         /// for type=6，紀錄合併的訊息數
         /// </summary>
-        public int count { get; set; }
+        public int MergedNotificationCount { get; set; }
+        /// <summary>
+        /// 合併的通知編號
+        /// </summary>
+        public List<int> MergeNotificationId { get; set; }
 
     }
 

@@ -82,6 +82,7 @@ namespace prjMSITUCookApi.Controllers
         [HttpPut]
         [Route("{id}")]
         public IActionResult Read([FromRoute] int id) {
+            
             var result = _notificationService.Read(id);
             if (result) {
                 return Ok();
