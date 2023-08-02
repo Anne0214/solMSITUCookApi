@@ -59,6 +59,16 @@ namespace prjMSITUCookApi.Service.Mappings
                 .ForMember(x=>x.ProfilePicture,y=>y.MapFrom(o=>o.PROFILE_PHOTO頭貼))
                 .ForMember(x=>x.Id,y=>y.MapFrom(o=>o.MEMBER_ID會員_PK));
 
+            #region shoppingCart
+            //shoppingCart
+            this.CreateMap<ShoppingCartPostInfo, ShoppingCartPostCondition>()
+               .ForMember(x => x.Sku, y => y.MapFrom(o => o.SkuId))
+               .ForMember(x => x.Spu, y => y.MapFrom(o => o.SpuId))
+               .ForMember(x => x.MemberId會員Fk, y => y.MapFrom(o => o.MemberId))
+               .ForMember(x => x.Quantity數量, y => y.MapFrom(o => o.Quantity))
+               .ForMember(x => x.SetupTime建立時間, y => y.MapFrom(o => o.SetupTime));
+
+            #endregion
 
         }
     }

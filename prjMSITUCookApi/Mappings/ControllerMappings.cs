@@ -29,6 +29,9 @@ namespace prjMSITUCookApi.Mappings
             this.CreateMap<NotificationRelatedRecipeResultModel, NotificationRelatedRecipeViewModel>();
             this.CreateMap<NotificationResultModel, NotificationViewModel>();
 
+            //shoppingCart
+            this.CreateMap<ShoppingCartPostParameter, ShoppingCartPostInfo>();
+            
 
         }
     }
