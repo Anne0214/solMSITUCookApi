@@ -59,6 +59,7 @@ namespace prjMSITUCookApi.Controllers
                 var vm = this._mapper.Map<NotificationResultModel, NotificationViewModel>(i);
                 vms.Add(vm);
             }
+            vms = vms.OrderByDescending(x => x.NotificationTime).ToList();
 
             return vms;
         }
