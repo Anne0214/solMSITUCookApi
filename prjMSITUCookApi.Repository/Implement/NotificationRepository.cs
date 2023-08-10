@@ -18,8 +18,8 @@ namespace prjMSITUCookApi.Repository.Implement
         private readonly string _connectString = @"Data Source=.;Initial Catalog=iSpanDataBaseUCook_V2;Integrated Security=True;TrustServerCertificate=true;MultipleActiveResultSets=true";
 
 
-        //刪除一則通知
-        bool INotificationRepository.Delete(int id)
+        //刪除一則通知(by id)
+        bool INotificationRepository.DeleteById(int id)
         {
             var sql = @"Delete From NOTIFICATION_RECORD_通知紀錄
                             Where NOTIFICATION_RECORD_通知紀錄_PK = @Id";
@@ -32,7 +32,7 @@ namespace prjMSITUCookApi.Repository.Implement
         }
 
         //取得一則通知
-        NotificationDataModel INotificationRepository.Get(int id)
+        NotificationDataModel INotificationRepository.GetById(int id)
         {
             var sql = @"Select * From NOTIFICATION_RECORD_通知紀錄
                             Where NOTIFICATION_RECORD_通知紀錄_PK = @Id";
@@ -43,6 +43,7 @@ namespace prjMSITUCookApi.Repository.Implement
                 return result;
             }
         }
+
 
         //新增通知
         public bool Create(NotificationCondition info) {
@@ -64,6 +65,7 @@ namespace prjMSITUCookApi.Repository.Implement
 
         IEnumerable<NotificationDataModel> INotificationRepository.GetList(NotificationSearchCondition info)
         {
+            //todo 增加搜尋條件
 
             var sql = @"Select * From NOTIFICATION_RECORD_通知紀錄
                             Where [MEMBER_ID會員_FK] = @Id";

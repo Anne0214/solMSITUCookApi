@@ -42,6 +42,8 @@ namespace prjMSITUCookApi.Service.Implement
             var condition = this._mapper.Map<LikeDeleteInfo, LikeDeleteCondition>(info);
             var result = _likeRepo.Delete(condition);
 
+            //todo 刪除相關的讚的通知
+
             return result;
         }
 
@@ -52,35 +54,33 @@ namespace prjMSITUCookApi.Service.Implement
         /// <returns></returns>
         bool ILikeService.Post(LikeInfo info)
         {
-            //todo 非同步，以及如果其中一邊失敗怎麼辦
-            //取得食譜資訊
-            var recipe = _recipeRepo.Get(info.RecipeId);
+            try
+            {
+                //取得食譜資訊
+                var recipe = _recipeRepo.Get(info.RecipeId);
+
+                //新增通知
+                NotificationCondition newNotification = new NotificationCondition()
+                {
+                    MemberId = recipe.AUTHOR_作者,
+                    ReadTime = null,
+                    NotificationTime = DateTime.Now,
+                    Type = 4,
+                    RelatedRecipeId = recipe.RECIPE食譜_PK
+                };
+                var createNotificationResult = _notificationRepo.Create(newNotification);
+
+                //按讚
+                var condition = this._mapper.Map<LikeInfo, LikeCondition>(info);
+                var result = _likeRepo.Post(condition);
+                return result;
+            }
+            catch {
+                //todo 刪除通知紀錄
+                //todo 刪除讚的紀錄
+                return false;
+            }
             
-            //新增通知
-            NotificationCondition newNotification = new NotificationCondition() { 
-                MemberId = recipe.AUTHOR_作者,
-                ReadTime =null,
-                NotificationTime=DateTime.Now,
-                Type = 4,
-                RelatedRecipeId = recipe.RECIPE食譜_PK
-            };
-            var createNotificationResult = _notificationRepo.Create(newNotification);
-
-            //刪除之前的合併
-            //if (createNotificationResult) {
-            //    //取得要刪除的通知
-            //    var oldNotification = _notificationRepo.GetList(new NotificationSearchCondition() { 
-            //        MemberId = recipe.AUTHOR_作者,
-            //        Type =4
-            //    }).Where(x=>x.LINKED_RECIPE相關食譜_FK==recipe.RECIPE食譜_PK).FirstOrDefault();
-            //    //刪除
-            //    var deleteResult = _notificationRepo.Delete(oldNotification.NOTIFICATION_RECORD_通知紀錄_PK);
-            //}
-            //按讚
-            var condition = this._mapper.Map<LikeInfo, LikeCondition>(info);
-            var result = _likeRepo.Post(condition);
-
-            return result;
         }
     }
 }

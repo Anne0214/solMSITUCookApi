@@ -11,7 +11,7 @@ namespace prjMSITUCookApi.Repository.Interface
     public interface INotificationRepository
     {
         //取得通知
-        NotificationDataModel Get(int id);
+        NotificationDataModel GetById(int id);
 
         //取得某用戶的某類通知(或全部)
         IEnumerable<NotificationDataModel> GetList(NotificationSearchCondition info);
@@ -29,6 +29,6 @@ namespace prjMSITUCookApi.Repository.Interface
         bool ReadList(List<int> idList);
 
         //刪除一則通知
-        bool Delete(int id);
+        bool DeleteById(int id);
     }
 }

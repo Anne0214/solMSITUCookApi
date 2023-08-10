@@ -42,13 +42,13 @@ namespace prjMSITUCookApi.Service.Implement
 
         bool INotificationService.Delete(int id)
         {
-            var result = _notificationRepo.Delete(id);
+            var result = _notificationRepo.DeleteById(id);
             return result;
         }
 
         NotificationResultModel INotificationService.Get(int id)
         {
-            var notification = _notificationRepo.Get(id);
+            var notification = _notificationRepo.GetById(id);
             NotificationResultModel result = this._mapper.Map<NotificationDataModel, NotificationResultModel>(notification);
             if (notification.LINKED_MEMBER_ID相關會員_FK != null)
             {
@@ -176,7 +176,7 @@ namespace prjMSITUCookApi.Service.Implement
         bool INotificationService.Read(int id)
         {
             //如果該通知type=4，會找同recipe的之前的通知通通已讀
-            var notification = _notificationRepo.Get(id);
+            var notification = _notificationRepo.GetById(id);
             var condition = new NotificationSearchCondition()
             {
                 MemberId= notification.MEMBER_ID會員_FK,
@@ -215,7 +215,7 @@ namespace prjMSITUCookApi.Service.Implement
 
             foreach (int i in idList) {
                 //找出前端裡面要已讀的四號通知
-                var notification=_notificationRepo.Get(i);
+                var notification=_notificationRepo.GetById(i);
                 if (notification != null)
                 {
                     if (notification.NOTIFICATION_TYPE通知類型編號 == 4)

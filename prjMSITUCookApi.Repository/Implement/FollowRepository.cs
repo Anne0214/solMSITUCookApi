@@ -32,7 +32,6 @@ namespace prjMSITUCookApi.Repository.Implement
                 var result = conn.QueryFirstOrDefault<FollowDataModel>(sql, parameter);
                 return result;
             }
-            
         }
         /// <summary>
         /// 取得某人的追蹤清單

@@ -34,10 +34,17 @@ namespace prjMSITUCookApi.Controllers
         /// </summary>
         /// <param name="parameter">搜尋參數</param>
         /// <response code="200">回傳符合條件追蹤關係列表</response>
+        /// <response code="400">parameter有錯</response>
+
         /// <returns></returns>
         [HttpGet]
         [Produces("application/json")] //指定回傳格式是json
         public IEnumerable<FollowViewModel> GetList([FromQuery]FollowSearchParameter parameter) {
+
+            if (!ModelState.IsValid) {
+                Response.StatusCode = 400;
+                return null;
+            }
             //轉成parameter
             var condition = _mapper.Map<FollowSearchParameter, FollowSearchInfo>(parameter);
             //使用服務取得資料
@@ -78,11 +85,15 @@ namespace prjMSITUCookApi.Controllers
         /// <returns>該筆新增資料的編號</returns>
         [HttpPost]
         public IActionResult Create([FromBody] FollowParameter parameter) {
+            
             var info = _mapper.Map<FollowParameter,FollowInfo>(parameter);
             var result= _followService.Insert(info);
             
-            if (result) {
+            if (result == "追蹤成功") {
                 return Ok();
+            }
+            if (result == "已經追蹤") {
+                return StatusCode(409);
             }
 
             return StatusCode(500);
@@ -92,7 +103,7 @@ namespace prjMSITUCookApi.Controllers
         /// </summary>
         /// <param name="parameter">取消追蹤所需參數</param>
         /// <response code="200">刪除成功</response>
-        /// <response code="404">不存在追蹤關係所以無法刪除</response>
+        /// <response code="500">刪除失敗，可能原因有不存在該追蹤關係或伺服器有問題等等原因</response>
         /// <returns></returns>
         [HttpDelete]
         public IActionResult Delete([FromQuery] FollowDeleteParameter parameter ) {
@@ -101,8 +112,6 @@ namespace prjMSITUCookApi.Controllers
             if (result) {
                 return Ok();
             }
-
-            
             return StatusCode(500);
         }
     }

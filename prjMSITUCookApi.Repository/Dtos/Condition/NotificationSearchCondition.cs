@@ -17,5 +17,6 @@ namespace prjMSITUCookApi.Repository.Dtos.Condition
         /// 通知類別號
         /// </summary>
         public int Type { get; set; }
+
     }
 }

@@ -32,7 +32,7 @@ namespace prjMSITUCookApi.Service.Interface
         /// </summary>
         /// <param name="info">建立追蹤所需資料</param>
         /// <returns></returns>
-        bool Insert(FollowInfo info);
+        string Insert(FollowInfo info);
 
         /// <summary>
         /// 取消追蹤
