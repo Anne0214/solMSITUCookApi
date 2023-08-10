@@ -70,7 +70,7 @@ namespace prjMSITUCookApi.Repository.Implement
             var parameter = new DynamicParameters();
             parameter.Add("WhoFollow",info.WhoFollow);
             parameter.Add("FollowWhom", info.FollowWhom);
-            parameter.Add("Time", DateTime.Now);
+            parameter.Add("Time", info.FollowTime);
             using (var conn = new SqlConnection(_connectString)) {
                 var result = conn.Execute(sql, parameter);
 

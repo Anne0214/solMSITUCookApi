@@ -35,7 +35,6 @@ namespace prjMSITUCookApi.Controllers
         /// <param name="parameter">搜尋參數</param>
         /// <response code="200">回傳符合條件追蹤關係列表</response>
         /// <response code="400">parameter有錯</response>
-
         /// <returns></returns>
         [HttpGet]
         [Produces("application/json")] //指定回傳格式是json
@@ -49,6 +48,11 @@ namespace prjMSITUCookApi.Controllers
             var condition = _mapper.Map<FollowSearchParameter, FollowSearchInfo>(parameter);
             //使用服務取得資料
             var data = _followService.GetList(condition);
+
+            if (data == null) {
+                Response.StatusCode = 404;
+                return null;
+            }
             //轉成回傳要的形式
             var result = _mapper.Map<IEnumerable<FollowResultModel>, IEnumerable<FollowViewModel>>(data);
             return result;

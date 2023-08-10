@@ -37,6 +37,10 @@ namespace prjMSITUCookApi.Controllers
         public NotificationViewModel Get([FromRoute] int id){
 
             var info = this._notificationService.Get(id);
+            if (info == null) {
+                Response.StatusCode = 404;
+                return null;
+            }
             var result = this._mapper.Map<NotificationResultModel,NotificationViewModel>(info);
 
             return result;
@@ -114,7 +118,7 @@ namespace prjMSITUCookApi.Controllers
         [HttpDelete]
         public IActionResult Delete(int id) {
 
-            var result = _notificationService.Delete(id);
+            var result = _notificationService.DeleteById(id);
             if (result) {
                 return Ok();
             }

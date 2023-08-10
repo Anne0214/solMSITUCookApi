@@ -21,7 +21,11 @@ namespace prjMSITUCookApi.Repository.Dtos.Condition
             /// 追蹤誰
             /// </summary>
             public int FollowWhom { get; set; }
+            /// <summary>
+            /// 追蹤時間
+            /// </summary>
+            public DateTime FollowTime { get; set; }
 
-        }
+    }
     }
 

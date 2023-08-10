@@ -38,13 +38,46 @@ namespace prjMSITUCookApi.Service.Implement
         /// <returns></returns>
         bool ILikeService.Delete(LikeDeleteInfo info)
         {
-            //刪除讚的紀錄
-            var condition = this._mapper.Map<LikeDeleteInfo, LikeDeleteCondition>(info);
-            var result = _likeRepo.Delete(condition);
+            //找到該筆讚的紀錄
+            LikeSearchCondition like = new LikeSearchCondition() {
+                MemberId = info.MemberId,
+                RecipeId = info.RecipeId,
+            };
+            if (like == null) {
+                return false;
+            }
+            try { 
+                //如果時間很近就要刪除通知，很遠就放著
+                var date = _likeRepo.GetList(like).FirstOrDefault().LIKED_TIME按讚時間;
+                if ((DateTime.Now - date).TotalDays < 30) {
+                    //刪除讚的通知
+                    var target = new NotificationSearchCondition()
+                    {
+                        MemberId = info.MemberId,
+                        Type = 4
+                    };
+                    var notificationId = _notificationRepo
+                                            .GetList(target)
+                                            .FirstOrDefault(x => x.NOTIFY_TIME通知時間 == date)
+                                            .NOTIFICATION_RECORD_通知紀錄_PK;
+                    var deleteNotification = _notificationRepo.DeleteById(notificationId);
+                }
+            }
+            catch {
+                //todo log
+            }
+            try
+            {
+                //刪除讚的紀錄
+                var condition = this._mapper.Map<LikeDeleteInfo, LikeDeleteCondition>(info);
+                var result = _likeRepo.Delete(condition);
 
-            //todo 刪除相關的讚的通知
-
-            return result;
+                return result;
+            }
+            catch {
+                //todo log
+                return false;
+            }
         }
 
         /// <summary>
@@ -54,33 +87,49 @@ namespace prjMSITUCookApi.Service.Implement
         /// <returns></returns>
         bool ILikeService.Post(LikeInfo info)
         {
-            try
-            {
-                //取得食譜資訊
-                var recipe = _recipeRepo.Get(info.RecipeId);
+            //取得食譜資訊
+            var recipe = _recipeRepo.Get(info.RecipeId);
 
+            if (recipe == null) {
+                return false;
+            }
+            var timeStamp = DateTime.Now;
+
+            try{
                 //新增通知
                 NotificationCondition newNotification = new NotificationCondition()
                 {
                     MemberId = recipe.AUTHOR_作者,
                     ReadTime = null,
-                    NotificationTime = DateTime.Now,
+                    NotificationTime = timeStamp,
                     Type = 4,
                     RelatedRecipeId = recipe.RECIPE食譜_PK
                 };
                 var createNotificationResult = _notificationRepo.Create(newNotification);
+            }
+            catch { 
+                //todo log紀錄
+            }
 
-                //按讚
+            try {
+                //新增按讚
+                info.Time = timeStamp;
                 var condition = this._mapper.Map<LikeInfo, LikeCondition>(info);
                 var result = _likeRepo.Post(condition);
                 return result;
-            }
-            catch {
-                //todo 刪除通知紀錄
-                //todo 刪除讚的紀錄
+            } catch{ 
+                //刪除通知紀錄
+                var target = new NotificationSearchCondition()
+                {
+                    MemberId = recipe.AUTHOR_作者,
+                    Type = 4
+                };
+                var id = _notificationRepo.GetList(target).FirstOrDefault(x=>x.NOTIFY_TIME通知時間== timeStamp).NOTIFICATION_RECORD_通知紀錄_PK;
+                bool deleteNotification = _notificationRepo.DeleteById(id);
+
                 return false;
             }
-            
         }
     }
 }
+

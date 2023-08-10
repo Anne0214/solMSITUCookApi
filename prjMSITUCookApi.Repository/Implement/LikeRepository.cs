@@ -33,10 +33,22 @@ namespace prjMSITUCookApi.Repository.Implement
 
         IEnumerable<LikeDataModel> ILikeRepository.GetList(LikeSearchCondition info)
         {
-            string sql = @"Select * From [LATEST_LIKE_LOG_最新按讚紀錄]
-                            Where [LIKED_RECIPE按讚食譜_FK]=@RecipeId";
+            if (info.MemberId == 0 && info.RecipeId == 0) {
+                return null;
+            }
+            string sql = @"Select * From [LATEST_LIKE_LOG_最新按讚紀錄] Where ";
             var parameter = new DynamicParameters();
-            parameter.Add("RecipeId", info.RecipeId);
+            if (info.MemberId != 0) {
+                sql += " [MEMBER_ID會員_FK]=@MemberId And";
+                parameter.Add("MemberId", info.MemberId);
+            }
+            if (info.RecipeId != 0) {
+                sql += " [LIKED_RECIPE按讚食譜_FK]=@RecipeId And";
+                parameter.Add("RecipeId", info.RecipeId);
+            }
+
+            sql = sql.Substring(0, sql.Length - 3);
+
             using (var conn = new SqlConnection(_connectString)) {
                 var result = conn.Query<LikeDataModel>(sql, parameter);
                 return result;
@@ -50,7 +62,7 @@ namespace prjMSITUCookApi.Repository.Implement
             var parameter = new DynamicParameters();
             parameter.Add("Member", info.MemberId);
             parameter.Add("Recipe", info.RecipeId);
-            parameter.Add("time", DateTime.Now);
+            parameter.Add("time", info.Time);
 
             using (var conn = new SqlConnection(_connectString)) {
                 var result = conn.Execute(sql, parameter);

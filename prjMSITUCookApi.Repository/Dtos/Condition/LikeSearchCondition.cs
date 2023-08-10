@@ -9,5 +9,7 @@ namespace prjMSITUCookApi.Repository.Dtos.Condition
     public class LikeSearchCondition
     {
         public int RecipeId { get; set; }
+
+        public int MemberId { get; set; }
     }
 }

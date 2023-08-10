@@ -16,5 +16,9 @@ namespace prjMSITUCookApi.Repository.Dtos.Condition
         /// 按讚的食譜Id
         /// </summary>
         public int RecipeId { get; set; }
+        /// <summary>
+        /// 按讚時間
+        /// </summary>
+        public DateTime Time { get; set; }
     }
 }

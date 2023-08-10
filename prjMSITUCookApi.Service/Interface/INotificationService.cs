@@ -23,6 +23,6 @@ namespace prjMSITUCookApi.Service.Interface
         bool ReadList(List<int> idList);
 
         //刪除一則通知
-        bool Delete(int id);
+        bool DeleteById(int id);
     }
 }
