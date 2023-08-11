@@ -54,6 +54,11 @@ namespace prjMSITUCookApi.Controllers
         [HttpGet]
         [Produces("application/json")] //指定回傳格式是json
         public IEnumerable<NotificationViewModel> GetList([FromQuery] NotificationSearchParameter parameter) {
+            if (parameter.MemberId == 0) {
+                Response.StatusCode = 400;
+                return null;
+            }
+            
             var info = this._mapper.Map<NotificationSearchParameter,NotificationSearchInfo>(parameter);
             var list = _notificationService.GetList(info);
 
