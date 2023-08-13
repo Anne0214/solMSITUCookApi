@@ -58,19 +58,27 @@ namespace prjMSITUCookApi.Controllers
                 Response.StatusCode = 400;
                 return null;
             }
-            
-            var info = this._mapper.Map<NotificationSearchParameter,NotificationSearchInfo>(parameter);
-            var list = _notificationService.GetList(info);
+            try { 
+                var info = this._mapper.Map<NotificationSearchParameter,NotificationSearchInfo>(parameter);
+                var list = _notificationService.GetList(info);
 
-            List<NotificationViewModel> vms = new List<NotificationViewModel>();
-            
-            foreach (var i in list) {
-                var vm = this._mapper.Map<NotificationResultModel, NotificationViewModel>(i);
-                vms.Add(vm);
+                List<NotificationViewModel> vms = new List<NotificationViewModel>();
+
+                if (list == null || list.Count() == 0) {
+                    return vms;
+                }
+                foreach (var i in list) {
+                    var vm = this._mapper.Map<NotificationResultModel, NotificationViewModel>(i);
+                    vms.Add(vm);
+                }
+                vms = vms.OrderByDescending(x => x.NotificationTime).ToList();
+                return vms;
             }
-            vms = vms.OrderByDescending(x => x.NotificationTime).ToList();
+            catch {
+                Response.StatusCode = 500;
 
-            return vms;
+                return null; }
+            
         }
 
         ///// <summary>
