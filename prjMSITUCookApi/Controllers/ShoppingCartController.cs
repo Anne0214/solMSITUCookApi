@@ -26,8 +26,16 @@ namespace prjMSITUCookApi.Controllers
         {
             var data = _mapper.Map<ShoppingCartPostParameter, ShoppingCartPostInfo>(model);
             data.SetupTime = DateTime.Now;
+            var carts = shoppingCartService.GetCartByMemberId(model.MemberId);
+            //logic
+
 
             return shoppingCartService.Insert(data);
+        }
+        [HttpGet]
+        public object AddToCart(int MemberId)
+        {
+            return shoppingCartService.GetCartByMemberId(MemberId);
         }
     }
 }

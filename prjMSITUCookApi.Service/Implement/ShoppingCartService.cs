@@ -1,13 +1,16 @@
 ﻿using AutoMapper;
 using prjMSITUCookApi.Repository.Dtos.Condition;
+using prjMSITUCookApi.Repository.Dtos.DataModel;
 using prjMSITUCookApi.Repository.Implement;
 using prjMSITUCookApi.Repository.Interface;
 using prjMSITUCookApi.Service.Dtos.Info;
+using prjMSITUCookApi.Service.Dtos.ResultModel;
 using prjMSITUCookApi.Service.Interface;
 using prjMSITUCookApi.Service.Mappings;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -23,6 +26,13 @@ namespace prjMSITUCookApi.Service.Implement
             this._shoppingCartRepository = new ShoppingCartRepository();
             this._mapper = new MapperConfiguration(cfg => cfg.AddProfile<ServiceMappings>()).CreateMapper();
         }
+
+        public List<ShoppingCartResultModel> GetCartByMemberId(int memberId)
+        {
+            var data = _shoppingCartRepository.GetCartByMemberId(memberId);
+            return _mapper.Map<List<ShoppingCartResultModel>>(data);
+        }
+
         public bool Insert(ShoppingCartPostInfo model)
         {
             var data = _mapper.Map<ShoppingCartPostInfo, ShoppingCartPostCondition>(model);
