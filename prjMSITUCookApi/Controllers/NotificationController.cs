@@ -72,6 +72,7 @@ namespace prjMSITUCookApi.Controllers
                     vms.Add(vm);
                 }
                 vms = vms.OrderByDescending(x => x.NotificationTime).ToList();
+                Response.StatusCode = 200;
                 return vms;
             }
             catch {
