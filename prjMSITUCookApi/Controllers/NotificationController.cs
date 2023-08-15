@@ -61,7 +61,7 @@ namespace prjMSITUCookApi.Controllers
             
             var info = this._mapper.Map<NotificationSearchParameter,NotificationSearchInfo>(parameter);
             var list = _notificationService.GetList(info);
-
+            
             List<NotificationViewModel> vms = new List<NotificationViewModel>();
             
             foreach (var i in list) {
