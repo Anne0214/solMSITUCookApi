@@ -49,16 +49,19 @@ namespace prjMSITUCookApi.Service.Implement
             try { 
                 //如果時間很近就要刪除通知，很遠就放著
                 var date = _likeRepo.GetList(like).FirstOrDefault().LIKED_TIME按讚時間;
+                var authorId = _recipeRepo.Get(info.RecipeId).AUTHOR_作者;
                 if ((DateTime.Now - date).TotalDays < 30) {
                     //刪除讚的通知
                     var target = new NotificationSearchCondition()
                     {
-                        MemberId = info.MemberId,
+                        MemberId = authorId, //換成作者
                         Type = 4
                     };
+                    //取離
                     var notificationId = _notificationRepo
                                             .GetList(target)
-                                            .FirstOrDefault(x => x.NOTIFY_TIME通知時間 == date)
+                                            .OrderBy(x=>Math.Abs((x.NOTIFY_TIME通知時間-date).TotalMilliseconds)) //時間相減的絕對值，從小排到大
+                                            .FirstOrDefault() //取最小的
                                             .NOTIFICATION_RECORD_通知紀錄_PK;
                     var deleteNotification = _notificationRepo.DeleteById(notificationId);
                 }
@@ -90,7 +93,18 @@ namespace prjMSITUCookApi.Service.Implement
             //取得食譜資訊
             var recipe = _recipeRepo.Get(info.RecipeId);
 
+            //確認食譜存在
             if (recipe == null) {
+                return false;
+            }
+
+            //確認是否已經按讚過，已按讚過不得重複按讚
+            LikeSearchCondition like = new LikeSearchCondition()
+            {
+                MemberId = info.MemberId,
+                RecipeId = info.RecipeId,
+            };
+            if (_likeRepo.GetList(like).FirstOrDefault() != null) {
                 return false;
             }
             var timeStamp = DateTime.Now;

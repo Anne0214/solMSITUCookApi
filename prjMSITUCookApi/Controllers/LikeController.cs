@@ -30,6 +30,7 @@ namespace prjMSITUCookApi.Controllers
         /// <returns></returns>
         [HttpPost]
         public IActionResult Post([FromBody]LikeParameter parameter) {
+
             var info = this._mapper.Map<LikeParameter, LikeInfo>(parameter);
             var result = this._likeService.Post(info);
 
